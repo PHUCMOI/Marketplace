@@ -1,0 +1,8 @@
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { authService, driverService, Driver as ApiDriver, DriverStatus } from '@logistics-marketplace/shared';
+export interface Driver { id:string; name:string; licenseNumber:string; phone:string; status:'Active'|'Inactive'|'On Leave'; yearsExperience:number; rating:number; }
+export interface DriversState { drivers:Driver[]; isLoading:boolean; error:string|null; }
+const initialState:DriversState={drivers:[],isLoading:false,error:null};
+const map=(x:ApiDriver):Driver=>({id:x.id,name:x.userId,licenseNumber:x.licenseNumber,phone:x.phone,status:x.status===DriverStatus.OnLeave?'On Leave':x.status===DriverStatus.Available||x.status===DriverStatus.OnDuty?'Active':'Inactive',yearsExperience:0,rating:0});
+export const fetchDrivers=createAsyncThunk('drivers/fetchDrivers',async(_,{rejectWithValue})=>{try{const org=authService.getStoredUser()?.organizationId;if(!org)throw new Error('Carrier organization is required');return (await driverService.getForOrganization(org)).map(map);}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch drivers');}});
+const slice=createSlice({name:'drivers',initialState,reducers:{},extraReducers:(builder)=>{builder.addCase(fetchDrivers.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchDrivers.fulfilled,(s,a:PayloadAction<Driver[]>)=>{s.isLoading=false;s.drivers=a.payload;}).addCase(fetchDrivers.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export default slice.reducer;

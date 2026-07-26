@@ -1,0 +1,7 @@
+import React from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { authService, UserRole } from '@logistics-marketplace/shared';
+import '../styles/navigation.css';
+interface NavItem { path:string; label:string; roles?:UserRole[]; }
+const items:NavItem[]=[{path:'/',label:'Home'},{path:'/shipper',label:'Shipper',roles:[UserRole.Shipper,UserRole.Admin]},{path:'/carrier',label:'Carrier',roles:[UserRole.Carrier,UserRole.Admin]},{path:'/dispatcher',label:'Dispatcher',roles:[UserRole.Dispatcher,UserRole.Admin]},{path:'/profile',label:'Profile',roles:Object.values(UserRole)}];
+export const Navigation:React.FC=()=>{const navigate=useNavigate();const user=authService.getStoredUser();const visible=items.filter((item)=>!item.roles||(user&&item.roles.includes(user.role)));const logout=()=>{authService.logout();navigate('/login');};return <nav className="app-navigation"><div className="nav-container"><ul className="nav-list">{visible.map((item)=><li key={item.path} className="nav-item"><NavLink to={item.path} end={item.path==='/'} className={({isActive})=>`nav-link ${isActive?'nav-link-active':''}`}><span className="nav-label">{item.label}</span></NavLink></li>)}<li className="nav-item">{user?<button type="button" className="nav-link" onClick={logout}>Đăng xuất</button>:<NavLink className="nav-link" to="/login">Đăng nhập</NavLink>}</li></ul></div></nav>;};

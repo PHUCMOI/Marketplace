@@ -1,0 +1,16 @@
+import React, { FormEvent, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { authService, UserRole } from '@logistics-marketplace/shared';
+
+export const LoginPage: React.FC = () => {
+  const navigate=useNavigate(); const [email,setEmail]=useState(''); const [password,setPassword]=useState(''); const [error,setError]=useState('');
+  const submit=async(e:FormEvent)=>{e.preventDefault();try{const result=await authService.login({email,password});const route=result.user.role===UserRole.Shipper?'/shipper':result.user.role===UserRole.Carrier?'/carrier':result.user.role===UserRole.Dispatcher?'/dispatcher':'/';navigate(route);}catch{setError('Email hoặc mật khẩu không đúng.');}};
+  return <main className="page-container"><h1>Đăng nhập</h1>{error&&<p role="alert">{error}</p>}<form onSubmit={submit}><label>Email<input type="email" required value={email} onChange={(e)=>setEmail(e.target.value)}/></label><label>Mật khẩu<input type="password" required value={password} onChange={(e)=>setPassword(e.target.value)}/></label><button type="submit">Đăng nhập</button></form><p>Chưa có tài khoản? <Link to="/register">Đăng ký</Link></p></main>;
+};
+
+export const RegisterPage: React.FC = () => {
+  const navigate=useNavigate(); const [form,setForm]=useState({email:'',fullName:'',password:'',role:UserRole.Shipper,organizationName:'',contactPhone:''}); const [error,setError]=useState('');
+  const change=(key:keyof typeof form,value:string)=>setForm((x)=>({...x,[key]:value}));
+  const submit=async(e:FormEvent)=>{e.preventDefault();try{const result=await authService.register({...form,organizationType:form.role});const route=result.user.role===UserRole.Shipper?'/shipper':result.user.role===UserRole.Carrier?'/carrier':result.user.role===UserRole.Dispatcher?'/dispatcher':'/';navigate(route);}catch{setError('Không thể đăng ký. Email có thể đã tồn tại hoặc dữ liệu chưa hợp lệ.');}};
+  return <main className="page-container"><h1>Đăng ký</h1>{error&&<p role="alert">{error}</p>}<form onSubmit={submit}><label>Họ tên<input required value={form.fullName} onChange={(e)=>change('fullName',e.target.value)}/></label><label>Email<input type="email" required value={form.email} onChange={(e)=>change('email',e.target.value)}/></label><label>Mật khẩu<input type="password" minLength={8} required value={form.password} onChange={(e)=>change('password',e.target.value)}/></label><label>Vai trò<select value={form.role} onChange={(e)=>change('role',e.target.value)}><option value={UserRole.Shipper}>Shipper</option><option value={UserRole.Carrier}>Carrier</option><option value={UserRole.Dispatcher}>Dispatcher</option><option value={UserRole.Broker}>Broker</option></select></label><label>Tên tổ chức<input required value={form.organizationName} onChange={(e)=>change('organizationName',e.target.value)}/></label><label>Điện thoại<input required value={form.contactPhone} onChange={(e)=>change('contactPhone',e.target.value)}/></label><button type="submit">Tạo tài khoản</button></form><p>Đã có tài khoản? <Link to="/login">Đăng nhập</Link></p></main>;
+};

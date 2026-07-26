@@ -1,0 +1,87 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9C8A6F8E-1234-4567-89AB-111111111111}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{9C8A6F8E-1234-4567-89AB-222222222222}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BFF", "BFF", "{9C8A6F8E-1234-4567-89AB-333333333333}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{9C8A6F8E-1234-4567-89AB-444444444444}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{9C8A6F8E-1234-4567-89AB-555555555555}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ops", "ops", "{9C8A6F8E-1234-4567-89AB-666666666666}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.Service.Domain", "src\Service\LogisticsMarketplace.Service.Domain\LogisticsMarketplace.Service.Domain.csproj", "{A1B2C3D4-1111-4567-89AB-111111111111}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.Service.Application", "src\Service\LogisticsMarketplace.Service.Application\LogisticsMarketplace.Service.Application.csproj", "{A1B2C3D4-2222-4567-89AB-222222222222}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.Service.Infrastructure", "src\Service\LogisticsMarketplace.Service.Infrastructure\LogisticsMarketplace.Service.Infrastructure.csproj", "{A1B2C3D4-3333-4567-89AB-333333333333}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.Service.Api", "src\Service\LogisticsMarketplace.Service.Api\LogisticsMarketplace.Service.Api.csproj", "{A1B2C3D4-4444-4567-89AB-444444444444}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.BFF.Api", "src\BFF\LogisticsMarketplace.BFF.Api\LogisticsMarketplace.BFF.Api.csproj", "{B1B2C3D4-2222-4567-89AB-222222222222}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.BFF.Application", "src\BFF\LogisticsMarketplace.BFF.Application\LogisticsMarketplace.BFF.Application.csproj", "{B1B2C3D4-1111-4567-89AB-111111111111}"
+EndProject
+
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogisticsMarketplace.Service.Integration.Tests", "tests\LogisticsMarketplace.Service.Integration.Tests\LogisticsMarketplace.Service.Integration.Tests.csproj", "{C1B2C3D4-1111-4567-89AB-111111111111}"
+EndProject
+
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-2222-4567-89AB-222222222222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-2222-4567-89AB-222222222222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-2222-4567-89AB-222222222222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-2222-4567-89AB-222222222222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-3333-4567-89AB-333333333333}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-3333-4567-89AB-333333333333}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-3333-4567-89AB-333333333333}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-3333-4567-89AB-333333333333}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1B2C3D4-4444-4567-89AB-444444444444}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1B2C3D4-4444-4567-89AB-444444444444}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1B2C3D4-4444-4567-89AB-444444444444}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1B2C3D4-4444-4567-89AB-444444444444}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B2C3D4-2222-4567-89AB-222222222222}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B2C3D4-2222-4567-89AB-222222222222}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B2C3D4-2222-4567-89AB-222222222222}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B2C3D4-2222-4567-89AB-222222222222}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1B2C3D4-1111-4567-89AB-111111111111}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1B2C3D4-1111-4567-89AB-111111111111}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9C8A6F8E-1234-4567-89AB-222222222222} = {9C8A6F8E-1234-4567-89AB-111111111111}
+		{9C8A6F8E-1234-4567-89AB-333333333333} = {9C8A6F8E-1234-4567-89AB-111111111111}
+		{9C8A6F8E-1234-4567-89AB-444444444444} = {9C8A6F8E-1234-4567-89AB-111111111111}
+		{A1B2C3D4-1111-4567-89AB-111111111111} = {9C8A6F8E-1234-4567-89AB-222222222222}
+		{A1B2C3D4-2222-4567-89AB-222222222222} = {9C8A6F8E-1234-4567-89AB-222222222222}
+		{A1B2C3D4-3333-4567-89AB-333333333333} = {9C8A6F8E-1234-4567-89AB-222222222222}
+		{A1B2C3D4-4444-4567-89AB-444444444444} = {9C8A6F8E-1234-4567-89AB-222222222222}
+		{B1B2C3D4-2222-4567-89AB-222222222222} = {9C8A6F8E-1234-4567-89AB-333333333333}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {12345678-1234-1234-1234-123456789ABC}
+	EndGlobalSection
+EndGlobal

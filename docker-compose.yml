@@ -1,0 +1,114 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: logistics-postgres
+    environment:
+      POSTGRES_DB: logistics_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - logistics-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # pgAdmin for database management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: logistics-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@logistics.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - logistics-network
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # Service API (Backend Core)
+  # Uncomment when ready to build
+  # service-api:
+  #   build:
+  #     context: .
+  #     dockerfile: src/Service/LogisticsMarketplace.Service.Api/Dockerfile
+  #   container_name: logistics-service-api
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #     ASPNETCORE_URLS: http://+:80
+  #     ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=logistics_db;Username=postgres;Password=postgres
+  #   ports:
+  #     - "5000:80"
+  #   networks:
+  #     - logistics-network
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   restart: unless-stopped
+
+  # BFF API (Backend-for-Frontend)
+  # Uncomment when ready to build
+  # bff-api:
+  #   build:
+  #     context: .
+  #     dockerfile: src/BFF/LogisticsMarketplace.BFF.Api/Dockerfile
+  #   container_name: logistics-bff-api
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Development
+  #     ASPNETCORE_URLS: http://+:80
+  #     ServiceApi__BaseUrl: http://service-api:80
+  #   ports:
+  #     - "5001:80"
+  #   networks:
+  #     - logistics-network
+  #   depends_on:
+  #     - service-api
+  #   restart: unless-stopped
+
+  # Frontend Web Application
+  # Uncomment when ready to build
+  # web:
+  #   build:
+  #     context: ./src/Frontend
+  #     dockerfile: Dockerfile
+  #   container_name: logistics-web
+  #   environment:
+  #     NODE_ENV: development
+  #     REACT_APP_BFF_API_URL: http://localhost:5001
+  #   ports:
+  #     - "3000:3000"
+  #   networks:
+  #     - logistics-network
+  #   depends_on:
+  #     - bff-api
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/Frontend:/app
+  #     - /app/node_modules
+
+networks:
+  logistics-network:
+    driver: bridge
+    name: logistics-network
+
+volumes:
+  postgres-data:
+    driver: local
+  pgadmin-data:
+    driver: local

@@ -1,0 +1,32 @@
+{
+  "name": "logistics-marketplace-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LogisticsMarketplace Frontend - Micro-frontends with Module Federation",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "lerna run start --parallel",
+    "build": "lerna run build",
+    "test": "lerna run test",
+    "lint": "lerna run lint",
+    "clean": "lerna clean -y && rm -rf node_modules",
+    "bootstrap": "lerna bootstrap",
+    "version": "lerna version",
+    "publish": "lerna publish"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "lerna": "^8.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "LogisticsMarketplace Team",
+  "license": "MIT",
+  "dependencies": {
+    "date-fns": "^4.4.0"
+  }
+}

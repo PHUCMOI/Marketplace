@@ -1,0 +1,41 @@
+{
+    "name":  "@logistics-marketplace/shared",
+    "version":  "1.0.0",
+    "description":  "Shared utilities, components, and services for LogisticsMarketplace micro-frontends",
+    "main":  "dist/index.js",
+    "types":  "dist/index.d.ts",
+    "files":  [
+                  "dist",
+                  "src"
+              ],
+    "scripts":  {
+                    "build":  "tsc \u0026\u0026 copyfiles -u 1 \"src/**/*.css\" dist",
+                    "type-check":  "tsc --noEmit",
+                    "clean":  "rm -rf dist",
+                    "dev":  "tsc --watch",
+                    "prepublishOnly":  "npm run build"
+                },
+    "keywords":  [
+                     "logistics",
+                     "marketplace",
+                     "shared",
+                     "components",
+                     "utilities"
+                 ],
+    "author":  "LogisticsMarketplace Team",
+    "license":  "MIT",
+    "peerDependencies":  {
+                             "react":  "^18.2.0",
+                             "react-dom":  "^18.2.0"
+                         },
+    "dependencies":  {
+                         "axios":  "^1.6.0",
+                         "date-fns":  "^3.0.0"
+                     },
+    "devDependencies":  {
+                            "@types/react":  "^18.2.0",
+                            "@types/react-dom":  "^18.2.0",
+                            "copyfiles":  "^2.4.1",
+                            "typescript":  "^5.3.0"
+                        }
+}

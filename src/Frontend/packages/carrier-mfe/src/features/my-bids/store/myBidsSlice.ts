@@ -1,0 +1,7 @@
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { authService, bidService } from '@logistics-marketplace/shared';
+export interface Bid { id:string; listingId:string; listingTitle:string; bidAmount:number; status:'Pending'|'Accepted'|'Rejected'|'Withdrawn'; createdAt:string; updatedAt:string; }
+export interface MyBidsState { bids:Bid[]; isLoading:boolean; error:string|null; }
+const initialState:MyBidsState={bids:[],isLoading:false,error:null};
+export const fetchMyBids=createAsyncThunk('myBids/fetchMyBids',async(_,{rejectWithValue})=>{try{const org=authService.getStoredUser()?.organizationId;if(!org)throw new Error('Carrier organization is required');const items=await bidService.getForCarrier(org);return items.map((x):Bid=>({id:x.id,listingId:x.listingId,listingTitle:x.listingId,bidAmount:x.proposedPriceAmount,status:x.status,createdAt:x.createdAt,updatedAt:x.createdAt}));}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch bids');}});
+const slice=createSlice({name:'myBids',initialState,reducers:{},extraReducers:(builder)=>{builder.addCase(fetchMyBids.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchMyBids.fulfilled,(s,a:PayloadAction<Bid[]>)=>{s.isLoading=false;s.bids=a.payload;}).addCase(fetchMyBids.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}}); export default slice.reducer;
