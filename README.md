@@ -34,44 +34,197 @@ Main aggregate roots are `Listing`, `Bid`, `Deal`, `Dispatch`, `Vehicle`, `Drive
 - Webpack 5 Module Federation, Lerna, npm workspaces
 - xUnit
 
-## Local development without Docker
+## Run locally without Docker (Windows PowerShell)
 
-Prerequisites:
+Run every command below from the repository root unless a step says to open a new terminal. Do not start the frontend from the repository root; its workspace is in `src\Frontend`.
+
+### 1. Install and verify prerequisites
 
 - .NET 8 SDK
 - Node.js 18+ and npm 9+
-- A local PostgreSQL instance on `localhost:5432`
-
-The default local database is `logistics_db` with user/password `postgres`. Override `ConnectionStrings__DefaultConnection` instead of committing a real credential. Development uses a local-only JWT key; production must provide `Jwt__Secret` through environment configuration.
+- PostgreSQL listening on `localhost:5432`
 
 ```powershell
-# From repository root
-dotnet restore
+dotnet --version
+node --version
+npm.cmd --version
+Test-NetConnection localhost -Port 5432
+```
+
+`TcpTestSucceeded` must be `True`. If it is `False`, start PostgreSQL from Windows Services before continuing.
+
+The checked-in development configuration expects:
+
+```text
+Host: localhost
+Port: 5432
+Database: logistics_db
+Username: postgres
+Password: postgres
+```
+
+If your PostgreSQL username or password is different, set the connection string in every PowerShell terminal that runs EF migrations or the Core API:
+
+```powershell
+$env:ConnectionStrings__DefaultConnection = 'Host=localhost;Port=5432;Database=logistics_db;Username=YOUR_USER;Password=YOUR_PASSWORD'
+```
+
+Do not commit a real password. The development JWT key is local-only; production must provide `Jwt__Secret` through environment configuration.
+
+### 2. Restore backend tools and packages
+
+```powershell
+dotnet restore LogisticsMarketplace.sln
 dotnet tool restore
+```
+
+### 3. Create and migrate the local database
+
+Keep the Core API stopped while applying migrations:
+
+```powershell
 dotnet tool run dotnet-ef database update `
   --project src\Service\LogisticsMarketplace.Service.Infrastructure\LogisticsMarketplace.Service.Infrastructure.csproj `
   --startup-project src\Service\LogisticsMarketplace.Service.Api\LogisticsMarketplace.Service.Api.csproj
-
-# Terminal 1: Core API on http://localhost:5000
-dotnet run --project src\Service\LogisticsMarketplace.Service.Api\LogisticsMarketplace.Service.Api.csproj --launch-profile LogisticsMarketplace.Service.Api
-
-# Terminal 2: BFF on http://localhost:5001
-dotnet run --project src\BFF\LogisticsMarketplace.BFF.Api\LogisticsMarketplace.BFF.Api.csproj --launch-profile http
-
-# Terminal 3: shell + three remotes
-Set-Location src\Frontend
-npm install
-npm start
 ```
 
-Frontend endpoints:
+A successful run creates or updates `logistics_db` and ends without an exception. This step is required: PostgreSQL may be reachable while the application still fails with `database "logistics_db" does not exist`.
 
-- Shell: `http://localhost:3000`
-- Dispatcher remote: `http://localhost:3001`
-- Carrier remote: `http://localhost:3002`
-- Shipper remote: `http://localhost:3003`
+If the PostgreSQL account cannot create databases, create `logistics_db` in pgAdmin first, or use `psql` when it is available on `PATH`:
 
-Register a non-admin account from `/register`, then sign in from `/login`.
+```powershell
+$env:PGPASSWORD = 'postgres'
+psql -h localhost -U postgres -d postgres -c 'CREATE DATABASE logistics_db;'
+Remove-Item Env:PGPASSWORD
+```
+
+Then run the EF migration command again.
+
+### 4. Start the Core Service
+
+Open terminal 1 at the repository root:
+
+```powershell
+dotnet run `
+  --project src\Service\LogisticsMarketplace.Service.Api\LogisticsMarketplace.Service.Api.csproj `
+  --launch-profile LogisticsMarketplace.Service.Api
+```
+
+Wait for the application to listen on `http://localhost:5000`, then verify it from another terminal:
+
+```powershell
+curl.exe -i http://localhost:5000/health
+```
+
+Expected status: `HTTP/1.1 200 OK`.
+
+### 5. Start the BFF
+
+Open terminal 2 at the repository root:
+
+```powershell
+dotnet run `
+  --project src\BFF\LogisticsMarketplace.BFF.Api\LogisticsMarketplace.BFF.Api.csproj `
+  --launch-profile http
+```
+
+The BFF calls the Core Service at `http://localhost:5000`. Verify the BFF:
+
+```powershell
+curl.exe -i http://localhost:5001/health
+```
+
+Expected status: `HTTP/1.1 200 OK`.
+
+### 6. Install and start all microfrontends
+
+Open terminal 3 at the repository root. Run `install` the first time and whenever dependencies change:
+
+```powershell
+Set-Location src\Frontend
+npm.cmd install
+npm.cmd start
+```
+
+`npm.cmd start` starts the shell and all three Module Federation remotes in the same terminal:
+
+| Application | URL | Usage |
+| --- | --- | --- |
+| Shell | `http://localhost:3000` | Main entry point; use this URL |
+| Dispatcher remote | `http://localhost:3001` | Loaded by the shell |
+| Carrier remote | `http://localhost:3002` | Loaded by the shell |
+| Shipper remote | `http://localhost:3003` | Loaded by the shell |
+
+Open only `http://localhost:3000` for normal use. The remote ports are not separate user-facing applications.
+
+### 7. Register and sign in
+
+1. Open `http://localhost:3000/register`.
+2. Register a non-admin `Shipper`, `Carrier`, or `Dispatcher` account.
+3. Open `http://localhost:3000/login` and sign in.
+4. The shell redirects to the microfrontend for the authenticated role.
+
+Administrator accounts cannot be self-registered.
+
+### 8. Confirm all local ports
+
+```powershell
+Get-NetTCPConnection -State Listen -LocalPort 3000,3001,3002,3003,5000,5001 `
+  -ErrorAction SilentlyContinue |
+  Sort-Object LocalPort |
+  Select-Object LocalAddress,LocalPort,OwningProcess
+```
+
+All six ports should be present. Stop each application with `Ctrl+C` in its terminal.
+
+### Current local-data limitation
+
+The migration creates the `Locations` table but does not seed locations, and there is not yet a Location management API. Registration, login, dashboards, and empty lists can run normally. Creating a listing currently requires existing pickup and delivery Location UUIDs.
+
+### Troubleshooting
+
+#### `database "logistics_db" does not exist`
+
+Stop the Core API and repeat step 3. The `/health` endpoint is currently a process-level check and does not prove that PostgreSQL or the application schema is ready.
+
+#### The main page is blank
+
+Confirm that `npm.cmd start` is still running and that ports `3000` through `3003` are listening. Then check that these remote manifests respond:
+
+```powershell
+curl.exe -I http://localhost:3001/remoteEntry.js
+curl.exe -I http://localhost:3002/remoteEntry.js
+curl.exe -I http://localhost:3003/remoteEntry.js
+```
+
+Restart the frontend after rebuilding the shared package if a stale bundle is cached:
+
+```powershell
+Set-Location src\Frontend
+npm.cmd run build --workspace packages/shared
+npm.cmd start
+```
+
+#### Login or API requests fail
+
+Check in this order:
+
+1. PostgreSQL is reachable on `5432`.
+2. The EF migration in step 3 completed successfully.
+3. Core Service health responds on `5000`.
+4. BFF health responds on `5001`.
+5. The browser is using the shell at `http://localhost:3000`.
+
+#### A port is already in use
+
+Find its process without stopping unrelated applications:
+
+```powershell
+Get-NetTCPConnection -State Listen -LocalPort 5000 |
+  Select-Object LocalPort,OwningProcess
+```
+
+Replace `5000` with the conflicting port, identify the owning process, and stop only the application you intended to restart.
 
 ## Verification
 
@@ -87,8 +240,8 @@ dotnet tool run dotnet-ef migrations has-pending-model-changes `
 
 # Frontend typecheck and production bundles
 Set-Location src\Frontend
-npx lerna run type-check --stream
-npm run build
+npx.cmd lerna run type-check --stream
+npm.cmd run build
 ```
 
 ## Repository layout

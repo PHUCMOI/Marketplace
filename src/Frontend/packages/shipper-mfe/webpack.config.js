@@ -71,7 +71,6 @@ module.exports = (env, argv) => {
       headers: {
         'Access-Control-Allow-Origin': '*',
       },
-      open: true,
     },
     optimization: {
       minimize: isProduction,

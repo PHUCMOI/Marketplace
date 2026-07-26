@@ -2,7 +2,10 @@ import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } f
 import { ApiError, ApiResponse } from '../types/api.types';
 import { storage, STORAGE_KEYS } from '../utils/storage';
 
-const API_BASE_URL = process.env.REACT_APP_BFF_API_URL || 'http://localhost:5001';
+const API_BASE_URL =
+  typeof process !== 'undefined' && process.env.REACT_APP_BFF_API_URL
+    ? process.env.REACT_APP_BFF_API_URL
+    : 'http://localhost:5001';
 
 class ApiClient {
   private readonly instance: AxiosInstance;

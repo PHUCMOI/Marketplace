@@ -1,47 +1,6 @@
-import React from 'react';
+﻿import React from 'react';
 import { Card, CardContent, Typography, Box } from '@mui/material';
-
-interface StatsCardProps {
-  title: string;
-  value: number;
-  color: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
-}
-
-const StatsCard: React.FC<StatsCardProps> = ({ title, value, color }) => {
-  const colorMap: Record<string, string> = {
-    primary: '#1976d2',
-    secondary: '#dc004e',
-    success: '#4caf50',
-    error: '#f44336',
-    warning: '#ff9800',
-    info: '#2196f3',
-  };
-
-  return (
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Box>
-            <Typography color="textSecondary" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="h5" sx={{ fontWeight: 'bold' }}>
-              {value}
-            </Typography>
-          </Box>
-          <Box
-            sx={{
-              width: 60,
-              height: 60,
-              borderRadius: '50%',
-              backgroundColor: colorMap[color],
-              opacity: 0.1,
-            }}
-          />
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
+interface StatsCardProps { title: string; value: number; color: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info'; }
+const colorMap = { primary: '#0b2d45', secondary: '#f4a61d', success: '#17805c', error: '#c23b3b', warning: '#c77909', info: '#16729a' };
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, color }) => <Card className="mfe-stat-card" sx={{ borderTop: `3px solid ${colorMap[color]}` }}><CardContent><Typography color="text.secondary">{title}</Typography><Box><Typography variant="h5">{value}</Typography></Box><Typography className="stat-caption">Current operational total</Typography></CardContent></Card>;
 export default StatsCard;
