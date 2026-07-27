@@ -45,7 +45,7 @@
 
 .load-toolbar { display: grid; grid-template-columns: minmax(240px,2fr) minmax(180px,1fr) auto; gap: 12px; align-items: end; margin-bottom: 14px; border: 1px solid #d4dde3; border-radius: 5px; padding: 16px; background: #fff; }
 .load-toolbar label, .listing-form label { display: grid; gap: 6px; color: #526875; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.load-toolbar input, .load-toolbar select, .listing-form input, .listing-form textarea { min-height: 40px; border: 1px solid #bfcbd3; border-radius: 3px; padding: 8px 10px; background: #fff; color: #162f40; }
+.load-toolbar input, .load-toolbar select, .listing-form input, .listing-form select, .listing-form textarea { min-height: 40px; border: 1px solid #bfcbd3; border-radius: 3px; padding: 8px 10px; background: #fff; color: #162f40; }
 .results-count { min-width: 96px; display: flex; flex-direction: column; align-items: flex-end; padding-bottom: 2px; }
 .results-count strong { font-size: 22px; line-height: 1; }
 .results-count span { margin-top: 3px; color: #667985; font-size: 10px; }
@@ -86,6 +86,7 @@
 .listing-form label:has(textarea), .listing-form button { grid-column: 1 / -1; }
 .listing-form textarea { min-height: 105px; resize: vertical; }
 .listing-form button { justify-self: end; min-width: 160px; background: #f4a61d; color: #132d40; }
+.listing-form button:disabled { cursor: not-allowed; opacity: .6; }
 .shipper-page dl { display: grid; grid-template-columns: 160px 1fr; max-width: 800px; margin: 18px 0; border: 1px solid #d5dee4; border-radius: 5px; background: #fff; overflow: hidden; }
 .shipper-page dt, .shipper-page dd { padding: 11px 14px; border-bottom: 1px solid #e5eaee; font-size: 12px; }
 .shipper-page dt { background: #f3f6f8; color: #5b6e7a; font-weight: 800; }

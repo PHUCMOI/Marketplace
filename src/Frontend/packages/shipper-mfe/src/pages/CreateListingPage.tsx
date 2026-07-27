@@ -28,7 +28,7 @@ const CreateListingPage: React.FC = () => {
       <label>Pickup date<input required type="datetime-local" value={form.pickupDate} onChange={(e) => change('pickupDate', e.target.value)} /></label>
       <label>Delivery date<input required type="datetime-local" value={form.deliveryDate} onChange={(e) => change('deliveryDate', e.target.value)} /></label>
       <label>Mô tả hàng<textarea required value={form.cargoDescription} onChange={(e) => change('cargoDescription', e.target.value)} /></label>
-      <label>Khối lượng (kg)<input required min="0.01" type="number" value={form.weight} onChange={(e) => change('weight', e.target.value)} /></label>
+      <label>Khối lượng (kg)<input required type="number" value={form.weight} onChange={(e) => change('weight', e.target.value)} /></label>
       <label>Giá dự kiến<input min="0" type="number" value={form.priceAmount} onChange={(e) => change('priceAmount', e.target.value)} /></label>
       <label>Tiền tệ<input value={form.priceCurrency} onChange={(e) => change('priceCurrency', e.target.value.toUpperCase())} /></label>
       <button type="submit">Tạo và publish</button>

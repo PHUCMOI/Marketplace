@@ -1,8 +1,13 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthUser, UserRole } from '@logistics-marketplace/shared';
 import '../styles/pages.css';
 
-export const HomePage: React.FC = () => (
+const routeForRole = (role: UserRole) => role === UserRole.Shipper ? '/shipper' : role === UserRole.Carrier ? '/carrier' : role === UserRole.Dispatcher ? '/dispatcher' : '/';
+
+export const HomePage: React.FC = () => {
+  const user = useAuthUser();
+  return (
   <div className="page-container home-page">
     <section className="hero-section">
       <div className="hero-copy">
@@ -10,8 +15,11 @@ export const HomePage: React.FC = () => (
         <h1 className="hero-title">Move every load with confidence.</h1>
         <p className="hero-subtitle">One operations workspace for posting loads, comparing qualified bids and managing every dispatch through delivery.</p>
         <div className="hero-actions">
-          <Link to="/register" className="button button-primary">Start shipping</Link>
-          <Link to="/login" className="button button-secondary">Sign in to workspace</Link>
+          {user ? (
+            <Link to={routeForRole(user.role)} className="button button-primary">Open workspace</Link>
+          ) : (
+            <><Link to="/register" className="button button-primary">Start shipping</Link><Link to="/login" className="button button-secondary">Sign in to workspace</Link></>
+          )}
         </div>
         <div className="trust-row"><span>Verified organizations</span><span>Live load board</span><span>Role-based workflows</span></div>
       </div>
@@ -34,4 +42,5 @@ export const HomePage: React.FC = () => (
       </div>
     </section>
   </div>
-);
+  );
+};

@@ -3,6 +3,7 @@ using LogisticsMarketplace.Service.Application.Interfaces;
 using LogisticsMarketplace.Service.Domain.Aggregates.BidAggregate;
 using LogisticsMarketplace.Service.Domain.Aggregates.DealAggregate;
 using LogisticsMarketplace.Service.Domain.Aggregates.ListingAggregate;
+using LogisticsMarketplace.Service.Domain.Aggregates.LocationAggregate;
 using LogisticsMarketplace.Service.Domain.Common.Enums;
 using LogisticsMarketplace.Service.Domain.Common.ValueObjects;
 using LogisticsMarketplace.Service.Domain.Repositories.Interfaces;
@@ -14,17 +15,20 @@ public sealed class ListingService : IListingService
     private readonly IListingRepository _listings;
     private readonly IBidRepository _bids;
     private readonly IDealRepository _deals;
+    private readonly ILocationRepository _locations;
     private readonly IUnitOfWork _unitOfWork;
 
     public ListingService(
         IListingRepository listings,
         IBidRepository bids,
         IDealRepository deals,
+        ILocationRepository locations,
         IUnitOfWork unitOfWork)
     {
         _listings = listings;
         _bids = bids;
         _deals = deals;
+        _locations = locations;
         _unitOfWork = unitOfWork;
     }
 
@@ -45,10 +49,21 @@ public sealed class ListingService : IListingService
 
     public async Task<ListingDto> CreateListingAsync(CreateListingDto dto, Guid userId, CancellationToken cancellationToken = default)
     {
+        var pickupLocationId = await ResolveLocationAsync(
+            dto.PickupLocationId,
+            dto.PickupLocation,
+            "Pickup",
+            cancellationToken);
+        var deliveryLocationId = await ResolveLocationAsync(
+            dto.DeliveryLocationId,
+            dto.DeliveryLocation,
+            "Delivery",
+            cancellationToken);
+
         var listing = new Listing(
             dto.ShipperOrgId,
-            dto.PickupLocationId,
-            dto.DeliveryLocationId,
+            pickupLocationId,
+            deliveryLocationId,
             dto.PickupDate,
             dto.DeliveryDate,
             dto.CargoDescription,
@@ -62,6 +77,33 @@ public sealed class ListingService : IListingService
         await _listings.AddAsync(listing, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return Map(listing);
+    }
+
+    private async Task<Guid> ResolveLocationAsync(
+        Guid? locationId,
+        ListingLocationInputDto? input,
+        string type,
+        CancellationToken cancellationToken)
+    {
+        if (locationId.HasValue && locationId.Value != Guid.Empty)
+            return locationId.Value;
+        if (input is null)
+            throw new ArgumentException($"{type} location is required.");
+
+        var addressLine = input.AddressLine.Trim();
+        if (addressLine.Length is < 3 or > 256)
+            throw new ArgumentException("\u0110\u1ecba ch\u1ec9 chi ti\u1ebft ph\u1ea3i c\u00f3 t\u1eeb 3 \u0111\u1ebfn 256 k\u00fd t\u1ef1.");
+
+        var province = VietnamProvinceCatalog.GetRequired(input.ProvinceCode);
+        var location = new Location(
+            $"{addressLine}, {province.Name}",
+            new Address(addressLine, province.Name, province.Name, province.Code, "Vi\u1ec7t Nam"),
+            province.Latitude,
+            province.Longitude,
+            type);
+
+        await _locations.AddAsync(location, cancellationToken);
+        return location.Id;
     }
 
     public async Task<ListingDto> UpdateListingAsync(Guid id, UpdateListingDto dto, CancellationToken cancellationToken = default)

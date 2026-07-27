@@ -20,6 +20,9 @@ public sealed class ServiceApiClient : IServiceApiClient
     public Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default) =>
         PostAsync<AuthResponse>("/api/auth/register", request, cancellationToken);
 
+    public Task<List<VietnamProvinceResponse>> GetVietnamProvincesAsync(CancellationToken cancellationToken = default) =>
+        GetListAsync<VietnamProvinceResponse>("/api/locations/vietnam-provinces", cancellationToken);
+
     public Task<List<ListingResponse>> GetOpenListingsAsync(CancellationToken cancellationToken = default) =>
         GetListAsync<ListingResponse>("/api/listings/open", cancellationToken);
 

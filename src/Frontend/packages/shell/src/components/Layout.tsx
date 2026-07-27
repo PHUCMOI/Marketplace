@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { Link } from 'react-router-dom';
-import { authService } from '@logistics-marketplace/shared';
+import { useAuthUser } from '@logistics-marketplace/shared';
 import { Navigation } from './Navigation';
 import '../styles/layout.css';
 
@@ -9,7 +9,7 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const user = authService.getStoredUser();
+  const user = useAuthUser();
   const initials = user?.fullName
     .split(' ')
     .filter(Boolean)

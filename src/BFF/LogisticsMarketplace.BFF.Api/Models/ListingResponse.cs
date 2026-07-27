@@ -27,8 +27,10 @@ public sealed class ListingDetailResponse : ListingResponse
 public sealed class CreateListingRequest
 {
     public Guid ShipperOrgId { get; set; }
-    public Guid PickupLocationId { get; set; }
-    public Guid DeliveryLocationId { get; set; }
+    public Guid? PickupLocationId { get; set; }
+    public Guid? DeliveryLocationId { get; set; }
+    public ListingLocationRequest? PickupLocation { get; set; }
+    public ListingLocationRequest? DeliveryLocation { get; set; }
     public DateTime PickupDate { get; set; }
     public DateTime DeliveryDate { get; set; }
     public string CargoDescription { get; set; } = string.Empty;

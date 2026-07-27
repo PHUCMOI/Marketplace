@@ -7,6 +7,8 @@ public interface IServiceApiClient
     Task<AuthResponse> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
     Task<AuthResponse> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
 
+    Task<List<VietnamProvinceResponse>> GetVietnamProvincesAsync(CancellationToken cancellationToken = default);
+
     Task<List<ListingResponse>> GetOpenListingsAsync(CancellationToken cancellationToken = default);
     Task<List<ListingResponse>> GetListingsForShipperAsync(Guid shipperOrgId, CancellationToken cancellationToken = default);
     Task<ListingDetailResponse?> GetListingByIdAsync(Guid id, CancellationToken cancellationToken = default);

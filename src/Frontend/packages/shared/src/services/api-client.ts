@@ -1,11 +1,12 @@
 import axios, { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { ApiError, ApiResponse } from '../types/api.types';
 import { storage, STORAGE_KEYS } from '../utils/storage';
+import { clearAuthSession } from './auth-session';
 
 const API_BASE_URL =
   typeof process !== 'undefined' && process.env.REACT_APP_BFF_API_URL
     ? process.env.REACT_APP_BFF_API_URL
-    : 'http://localhost:5001';
+    : 'https://localhost:7001';
 
 class ApiClient {
   private readonly instance: AxiosInstance;
@@ -21,8 +22,7 @@ class ApiClient {
       response => response,
       (error: AxiosError) => {
         if (error.response?.status === 401) {
-          storage.remove(STORAGE_KEYS.ACCESS_TOKEN);
-          storage.remove(STORAGE_KEYS.USER);
+          clearAuthSession();
         }
         return Promise.reject(this.toApiError(error));
       }

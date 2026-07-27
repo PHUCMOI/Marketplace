@@ -22,8 +22,10 @@ public class ListingDto
 public class CreateListingDto
 {
     public Guid ShipperOrgId { get; set; }
-    public Guid PickupLocationId { get; set; }
-    public Guid DeliveryLocationId { get; set; }
+    public Guid? PickupLocationId { get; set; }
+    public Guid? DeliveryLocationId { get; set; }
+    public ListingLocationInputDto? PickupLocation { get; set; }
+    public ListingLocationInputDto? DeliveryLocation { get; set; }
     public DateTime PickupDate { get; set; }
     public DateTime DeliveryDate { get; set; }
     public string CargoDescription { get; set; } = string.Empty;

@@ -177,9 +177,9 @@ Get-NetTCPConnection -State Listen -LocalPort 3000,3001,3002,3003,5000,5001 `
 
 All six ports should be present. Stop each application with `Ctrl+C` in its terminal.
 
-### Current local-data limitation
+### Vietnam address selection
 
-The migration creates the `Locations` table but does not seed locations, and there is not yet a Location management API. Registration, login, dashboards, and empty lists can run normally. Creating a listing currently requires existing pickup and delivery Location UUIDs.
+The create-listing form loads the official 34 province-level administrative units from `GET /api/locations/vietnam-provinces`. Users select a province/city and enter a detailed pickup and delivery address; the Service API creates both `Location` records together with the listing, so no Location UUIDs or seed data are required.
 
 ### Troubleshooting
 

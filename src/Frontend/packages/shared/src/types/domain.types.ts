@@ -1,5 +1,32 @@
 import { BidStatus, DealStatus, DispatchStatus, DriverStatus, ListingStatus, VehicleStatus } from './enums';
 
+export interface VietnamProvince {
+  code: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+}
+
+export interface ListingLocationInput {
+  addressLine: string;
+  provinceCode: string;
+}
+
+export interface CreateListingRequest {
+  shipperOrgId?: string;
+  pickupLocation?: ListingLocationInput;
+  deliveryLocation?: ListingLocationInput;
+  pickupLocationId?: string;
+  deliveryLocationId?: string;
+  pickupDate: string;
+  deliveryDate: string;
+  cargoDescription: string;
+  weight: number;
+  priceAmount?: number;
+  priceCurrency?: string;
+  publishImmediately?: boolean;
+}
+
 export interface Listing {
   id: string;
   shipperOrgId: string;

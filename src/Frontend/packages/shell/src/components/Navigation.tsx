@@ -1,6 +1,6 @@
 ﻿import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { authService, UserRole } from '@logistics-marketplace/shared';
+import { authService, useAuthUser, UserRole } from '@logistics-marketplace/shared';
 import '../styles/navigation.css';
 
 interface NavItem { path: string; label: string; end?: boolean; }
@@ -38,7 +38,7 @@ const adminNavigation: NavItem[] = [
 
 export const Navigation: React.FC = () => {
   const navigate = useNavigate();
-  const user = authService.getStoredUser();
+  const user = useAuthUser();
   const items = user?.role === UserRole.Admin
     ? adminNavigation
     : user ? roleNavigation[user.role] || [] : [{ path: '/', label: 'Platform', end: true }];

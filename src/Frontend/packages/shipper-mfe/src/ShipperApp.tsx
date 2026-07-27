@@ -3,7 +3,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import ShipperDashboard from './pages/ShipperDashboard';
 import ListingsPage from './pages/ListingsPage';
-import CreateListingPage from './pages/CreateListingPage';
+import CreateListingPage from './pages/CreateListingAddressPage';
 import ListingDetailPage from './pages/ListingDetailPage';
 import EditListingPage from './pages/EditListingPage';
 import BidsPage from './pages/BidsPage';
