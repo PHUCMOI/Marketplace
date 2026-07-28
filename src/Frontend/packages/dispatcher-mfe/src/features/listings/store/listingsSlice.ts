@@ -1,10 +1,72 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { bidService, listingService, Listing as ApiListing, ListingStatus } from '@logistics-marketplace/shared';
-export interface Listing { id:string; title:string; origin:string; destination:string; weight:number; status:'Active'|'Pending'|'Completed'|'Cancelled'; createdAt:string; bidCount:number; }
-interface ListingsState { listings:Listing[]; currentListing:Listing|null; isLoading:boolean; error:string|null; }
-const initialState:ListingsState={listings:[],currentListing:null,isLoading:false,error:null};
-const status=(value:ListingStatus):Listing['status']=>value===ListingStatus.Open?'Active':value===ListingStatus.Draft?'Pending':value===ListingStatus.Awarded?'Completed':'Cancelled';
-const map=async(x:ApiListing):Promise<Listing>=>({id:x.id,title:x.cargoDescription,origin:x.pickupLocationId,destination:x.deliveryLocationId,weight:x.weight,status:status(x.status),createdAt:x.createdAt,bidCount:(await bidService.getByListing(x.id)).length});
-export const fetchListings=createAsyncThunk('listings/fetchListings',async(_,{rejectWithValue})=>{try{return await Promise.all((await listingService.getAll()).map(map));}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch listings');}});
-export const fetchListingById=createAsyncThunk('listings/fetchListingById',async(id:string,{rejectWithValue})=>{try{return await map(await listingService.getById(id));}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch listing');}});
-const slice=createSlice({name:'listings',initialState,reducers:{clearCurrentListing:(s)=>{s.currentListing=null;}},extraReducers:(builder)=>{builder.addCase(fetchListings.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchListings.fulfilled,(s,a:PayloadAction<Listing[]>)=>{s.isLoading=false;s.listings=a.payload;}).addCase(fetchListings.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;}).addCase(fetchListingById.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchListingById.fulfilled,(s,a:PayloadAction<Listing>)=>{s.isLoading=false;s.currentListing=a.payload;}).addCase(fetchListingById.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export const {clearCurrentListing}=slice.actions;export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface Listing {
+  id: string;
+  title: string;
+  origin: string;
+  destination: string;
+  weight: number;
+  status: 'Active' | 'Pending' | 'Completed' | 'Cancelled';
+  createdAt: string;
+  bidCount: number;
+}
+
+interface ListingsState {
+  listings: Listing[];
+  currentListing: Listing | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: ListingsState = {
+  listings: [],
+  currentListing: null,
+  isLoading: false,
+  error: null,
+};
+
+const listingsSlice = createSlice({
+  name: 'listings',
+  initialState,
+  reducers: {
+    fetchListings(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchListingsSucceeded(state, action: PayloadAction<Listing[]>) {
+      state.isLoading = false;
+      state.listings = action.payload;
+    },
+    fetchListingsFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    fetchListingById(state, _action: PayloadAction<string>) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchListingByIdSucceeded(state, action: PayloadAction<Listing>) {
+      state.isLoading = false;
+      state.currentListing = action.payload;
+    },
+    fetchListingByIdFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    clearCurrentListing(state) {
+      state.currentListing = null;
+    },
+  },
+});
+
+export const {
+  fetchListings,
+  fetchListingsSucceeded,
+  fetchListingsFailed,
+  fetchListingById,
+  fetchListingByIdSucceeded,
+  fetchListingByIdFailed,
+  clearCurrentListing,
+} = listingsSlice.actions;
+
+export default listingsSlice.reducer;

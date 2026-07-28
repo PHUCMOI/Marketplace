@@ -61,6 +61,14 @@ export interface Bid {
   createdAt: string;
 }
 
+export interface CreateBidRequest {
+  listingId: string;
+  carrierOrgId: string;
+  proposedPriceAmount: number;
+  proposedPriceCurrency: string;
+  message?: string;
+}
+
 export interface Deal {
   id: string;
   listingId: string;

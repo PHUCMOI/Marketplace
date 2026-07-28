@@ -1,8 +1,47 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { authService, vehicleService, Vehicle as ApiVehicle, VehicleStatus } from '@logistics-marketplace/shared';
-export interface Vehicle { id:string; licensePlate:string; type:string; capacity:number; year:number; status:'Active'|'Inactive'|'Maintenance'; lastInspection:string; }
-export interface VehiclesState { vehicles:Vehicle[]; isLoading:boolean; error:string|null; }
-const initialState:VehiclesState={vehicles:[],isLoading:false,error:null};
-const map=(x:ApiVehicle):Vehicle=>({id:x.id,licensePlate:x.plateNumber,type:x.type,capacity:x.capacity,year:0,status:x.status===VehicleStatus.Available?'Active':x.status===VehicleStatus.Maintenance?'Maintenance':'Inactive',lastInspection:''});
-export const fetchVehicles=createAsyncThunk('vehicles/fetchVehicles',async(_,{rejectWithValue})=>{try{const org=authService.getStoredUser()?.organizationId;if(!org)throw new Error('Carrier organization is required');return (await vehicleService.getForOrganization(org)).map(map);}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch vehicles');}});
-const slice=createSlice({name:'vehicles',initialState,reducers:{},extraReducers:(builder)=>{builder.addCase(fetchVehicles.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchVehicles.fulfilled,(s,a:PayloadAction<Vehicle[]>)=>{s.isLoading=false;s.vehicles=a.payload;}).addCase(fetchVehicles.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface Vehicle {
+  id: string;
+  licensePlate: string;
+  type: string;
+  capacity: number;
+  year: number;
+  status: 'Active' | 'Inactive' | 'Maintenance';
+  lastInspection: string;
+}
+
+export interface VehiclesState {
+  vehicles: Vehicle[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: VehiclesState = {
+  vehicles: [],
+  isLoading: false,
+  error: null,
+};
+
+const vehiclesSlice = createSlice({
+  name: 'vehicles',
+  initialState,
+  reducers: {
+    fetchVehicles(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchVehiclesSucceeded(state, action: PayloadAction<Vehicle[]>) {
+      state.isLoading = false;
+      state.vehicles = action.payload;
+    },
+    fetchVehiclesFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+  },
+});
+
+export const { fetchVehicles, fetchVehiclesSucceeded, fetchVehiclesFailed } =
+  vehiclesSlice.actions;
+
+export default vehiclesSlice.reducer;

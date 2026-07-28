@@ -159,7 +159,37 @@ public sealed class ServiceApiClient : IServiceApiClient
 
     private async Task<T> ReadRequiredAsync<T>(HttpResponseMessage response, CancellationToken cancellationToken)
     {
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            var body = await response.Content.ReadAsStringAsync(cancellationToken);
+            var message = response.ReasonPhrase ?? "Service API request failed.";
+
+            if (!string.IsNullOrWhiteSpace(body))
+            {
+                try
+                {
+                    using var document = JsonDocument.Parse(body);
+                    var root = document.RootElement;
+                    if (root.TryGetProperty("detail", out var detail) &&
+                        detail.ValueKind == JsonValueKind.String)
+                    {
+                        message = detail.GetString() ?? message;
+                    }
+                    else if (root.TryGetProperty("title", out var title) &&
+                             title.ValueKind == JsonValueKind.String)
+                    {
+                        message = title.GetString() ?? message;
+                    }
+                }
+                catch (JsonException)
+                {
+                    // Keep the HTTP reason phrase when the downstream body is not JSON.
+                }
+            }
+
+            throw new HttpRequestException(message, null, response.StatusCode);
+        }
+
         return await response.Content.ReadFromJsonAsync<T>(_json, cancellationToken)
             ?? throw new InvalidOperationException($"Service API returned an empty {typeof(T).Name} response.");
     }

@@ -1,7 +1,47 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { authService, bidService, dealService, dispatchService, listingService, BidStatus, DealStatus, DispatchStatus } from '@logistics-marketplace/shared';
-interface DashboardStats { availableLoads:number; activeBids:number; activeDispatches:number; totalRevenue:number; }
-export interface DashboardState { stats:DashboardStats|null; isLoading:boolean; error:string|null; }
-const initialState:DashboardState={stats:null,isLoading:false,error:null};
-export const fetchDashboardStats=createAsyncThunk('dashboard/fetchStats',async(_,{rejectWithValue})=>{try{const org=authService.getStoredUser()?.organizationId;if(!org)throw new Error('Carrier organization is required');const [listings,bids,deals,dispatches]=await Promise.all([listingService.getAll(),bidService.getForCarrier(org),dealService.getForCarrier(org),dispatchService.getForCarrier(org)]);return {availableLoads:listings.length,activeBids:bids.filter((x)=>x.status===BidStatus.Pending).length,activeDispatches:dispatches.filter((x)=>x.status!==DispatchStatus.Delivered&&x.status!==DispatchStatus.Cancelled&&x.status!==DispatchStatus.Failed).length,totalRevenue:deals.filter((x)=>x.status===DealStatus.Completed).reduce((sum,x)=>sum+x.agreedPriceAmount,0)};}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch dashboard stats');}});
-const slice=createSlice({name:'dashboard',initialState,reducers:{},extraReducers:(builder)=>{builder.addCase(fetchDashboardStats.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchDashboardStats.fulfilled,(s,a:PayloadAction<DashboardStats>)=>{s.isLoading=false;s.stats=a.payload;}).addCase(fetchDashboardStats.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface DashboardStats {
+  availableLoads: number;
+  activeBids: number;
+  activeDispatches: number;
+  totalRevenue: number;
+}
+
+export interface DashboardState {
+  stats: DashboardStats | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: DashboardState = {
+  stats: null,
+  isLoading: false,
+  error: null,
+};
+
+const dashboardSlice = createSlice({
+  name: 'dashboard',
+  initialState,
+  reducers: {
+    fetchDashboardStats(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchDashboardStatsSucceeded(state, action: PayloadAction<DashboardStats>) {
+      state.isLoading = false;
+      state.stats = action.payload;
+    },
+    fetchDashboardStatsFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+  },
+});
+
+export const {
+  fetchDashboardStats,
+  fetchDashboardStatsSucceeded,
+  fetchDashboardStatsFailed,
+} = dashboardSlice.actions;
+
+export default dashboardSlice.reducer;

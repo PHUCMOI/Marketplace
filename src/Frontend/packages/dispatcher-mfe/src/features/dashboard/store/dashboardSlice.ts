@@ -1,7 +1,47 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { bidService, dealService, listingService, BidStatus, DealStatus } from '@logistics-marketplace/shared';
-export interface DashboardStats { activeListings:number; pendingBids:number; activeDeals:number; completedToday:number; }
-interface DashboardState { stats:DashboardStats|null; isLoading:boolean; error:string|null; }
-const initialState:DashboardState={stats:null,isLoading:false,error:null};
-export const fetchDashboardStats=createAsyncThunk('dashboard/fetchStats',async(_,{rejectWithValue})=>{try{const [listings,deals]=await Promise.all([listingService.getAll(),dealService.getAll()]);const groups=await Promise.all(listings.map((x)=>bidService.getByListing(x.id)));const today=new Date().toISOString().slice(0,10);return {activeListings:listings.length,pendingBids:groups.flat().filter((x)=>x.status===BidStatus.Pending).length,activeDeals:deals.filter((x)=>x.status===DealStatus.Active).length,completedToday:deals.filter((x)=>x.status===DealStatus.Completed&&x.completedAt?.slice(0,10)===today).length};}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch dashboard stats');}});
-const slice=createSlice({name:'dashboard',initialState,reducers:{},extraReducers:(builder)=>{builder.addCase(fetchDashboardStats.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchDashboardStats.fulfilled,(s,a:PayloadAction<DashboardStats>)=>{s.isLoading=false;s.stats=a.payload;}).addCase(fetchDashboardStats.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface DashboardStats {
+  activeListings: number;
+  pendingBids: number;
+  activeDeals: number;
+  completedToday: number;
+}
+
+interface DashboardState {
+  stats: DashboardStats | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: DashboardState = {
+  stats: null,
+  isLoading: false,
+  error: null,
+};
+
+const dashboardSlice = createSlice({
+  name: 'dashboard',
+  initialState,
+  reducers: {
+    fetchDashboardStats(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchDashboardStatsSucceeded(state, action: PayloadAction<DashboardStats>) {
+      state.isLoading = false;
+      state.stats = action.payload;
+    },
+    fetchDashboardStatsFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+  },
+});
+
+export const {
+  fetchDashboardStats,
+  fetchDashboardStatsSucceeded,
+  fetchDashboardStatsFailed,
+} = dashboardSlice.actions;
+
+export default dashboardSlice.reducer;

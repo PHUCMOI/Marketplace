@@ -1,9 +1,73 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { dealService, Deal as ApiDeal, DealStatus } from '@logistics-marketplace/shared';
-export interface Deal { id:string; listingId:string; listingTitle:string; carrierName:string; amount:number; status:'Active'|'Completed'|'Cancelled'; startDate:string; estimatedDelivery:string; progress:number; }
-interface DealsState { deals:Deal[]; currentDeal:Deal|null; isLoading:boolean; error:string|null; }
-const initialState:DealsState={deals:[],currentDeal:null,isLoading:false,error:null};
-const map=(x:ApiDeal):Deal=>({id:x.id,listingId:x.listingId,listingTitle:x.listingId,carrierName:x.carrierOrgId,amount:x.agreedPriceAmount,status:x.status,startDate:x.createdAt,estimatedDelivery:x.completedAt??'',progress:x.status===DealStatus.Completed?100:x.status===DealStatus.Active?50:0});
-export const fetchDeals=createAsyncThunk('deals/fetchDeals',async(_,{rejectWithValue})=>{try{return (await dealService.getAll()).map(map);}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch deals');}});
-export const fetchDealById=createAsyncThunk('deals/fetchDealById',async(id:string,{rejectWithValue})=>{try{return map(await dealService.getById(id));}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch deal');}});
-const slice=createSlice({name:'deals',initialState,reducers:{clearCurrentDeal:(s)=>{s.currentDeal=null;}},extraReducers:(builder)=>{builder.addCase(fetchDeals.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchDeals.fulfilled,(s,a:PayloadAction<Deal[]>)=>{s.isLoading=false;s.deals=a.payload;}).addCase(fetchDeals.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;}).addCase(fetchDealById.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchDealById.fulfilled,(s,a:PayloadAction<Deal>)=>{s.isLoading=false;s.currentDeal=a.payload;}).addCase(fetchDealById.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});export const {clearCurrentDeal}=slice.actions;export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface Deal {
+  id: string;
+  listingId: string;
+  listingTitle: string;
+  carrierName: string;
+  amount: number;
+  status: 'Active' | 'Completed' | 'Cancelled';
+  startDate: string;
+  estimatedDelivery: string;
+  progress: number;
+}
+
+interface DealsState {
+  deals: Deal[];
+  currentDeal: Deal | null;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const initialState: DealsState = {
+  deals: [],
+  currentDeal: null,
+  isLoading: false,
+  error: null,
+};
+
+const dealsSlice = createSlice({
+  name: 'deals',
+  initialState,
+  reducers: {
+    fetchDeals(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchDealsSucceeded(state, action: PayloadAction<Deal[]>) {
+      state.isLoading = false;
+      state.deals = action.payload;
+    },
+    fetchDealsFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    fetchDealById(state, _action: PayloadAction<string>) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchDealByIdSucceeded(state, action: PayloadAction<Deal>) {
+      state.isLoading = false;
+      state.currentDeal = action.payload;
+    },
+    fetchDealByIdFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    clearCurrentDeal(state) {
+      state.currentDeal = null;
+    },
+  },
+});
+
+export const {
+  fetchDeals,
+  fetchDealsSucceeded,
+  fetchDealsFailed,
+  fetchDealById,
+  fetchDealByIdSucceeded,
+  fetchDealByIdFailed,
+  clearCurrentDeal,
+} = dealsSlice.actions;
+
+export default dealsSlice.reducer;

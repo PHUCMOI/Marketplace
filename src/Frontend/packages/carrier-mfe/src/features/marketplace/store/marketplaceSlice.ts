@@ -1,10 +1,108 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { listingService, Listing as ApiListing } from '@logistics-marketplace/shared';
-export interface Listing { id:string; title:string; origin:string; destination:string; pickupDate:string; deliveryDate:string; weight:number; rate:number; status:string; }
-export interface MarketplaceState { availableListings:Listing[]; currentListing:Listing|null; isLoading:boolean; error:string|null; }
-const initialState:MarketplaceState={availableListings:[],currentListing:null,isLoading:false,error:null};
-const map=(item:ApiListing):Listing=>({id:item.id,title:item.cargoDescription,origin:item.pickupLocationId,destination:item.deliveryLocationId,pickupDate:item.pickupDate,deliveryDate:item.deliveryDate,weight:item.weight,rate:item.priceAmount??0,status:item.status});
-export const fetchAvailableListings=createAsyncThunk('marketplace/fetchAvailableListings',async(_,{rejectWithValue})=>{try{return (await listingService.getAll()).map(map);}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch listings');}});
-export const fetchListingById=createAsyncThunk('marketplace/fetchListingById',async(id:string,{rejectWithValue})=>{try{return map(await listingService.getById(id));}catch(error){return rejectWithValue(error instanceof Error?error.message:'Failed to fetch listing');}});
-const slice=createSlice({name:'marketplace',initialState,reducers:{clearCurrentListing:(state)=>{state.currentListing=null;}},extraReducers:(builder)=>{builder.addCase(fetchAvailableListings.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchAvailableListings.fulfilled,(s,a:PayloadAction<Listing[]>)=>{s.isLoading=false;s.availableListings=a.payload;}).addCase(fetchAvailableListings.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;}).addCase(fetchListingById.pending,(s)=>{s.isLoading=true;s.error=null;}).addCase(fetchListingById.fulfilled,(s,a:PayloadAction<Listing>)=>{s.isLoading=false;s.currentListing=a.payload;}).addCase(fetchListingById.rejected,(s,a)=>{s.isLoading=false;s.error=a.payload as string;});}});
-export const {clearCurrentListing}=slice.actions; export default slice.reducer;
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+
+export interface Listing {
+  id: string;
+  title: string;
+  origin: string;
+  destination: string;
+  pickupDate: string;
+  deliveryDate: string;
+  weight: number;
+  rate: number;
+  currency: string;
+  status: string;
+}
+
+export interface PlaceBidPayload {
+  listingId: string;
+  proposedPriceAmount: number;
+  proposedPriceCurrency: string;
+  message?: string;
+}
+
+export interface MarketplaceState {
+  availableListings: Listing[];
+  currentListing: Listing | null;
+  isLoading: boolean;
+  error: string | null;
+  isSubmittingBid: boolean;
+  bidError: string | null;
+  submittedBidId: string | null;
+}
+
+const initialState: MarketplaceState = {
+  availableListings: [],
+  currentListing: null,
+  isLoading: false,
+  error: null,
+  isSubmittingBid: false,
+  bidError: null,
+  submittedBidId: null,
+};
+
+const marketplaceSlice = createSlice({
+  name: 'marketplace',
+  initialState,
+  reducers: {
+    fetchAvailableListings(state) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchAvailableListingsSucceeded(state, action: PayloadAction<Listing[]>) {
+      state.isLoading = false;
+      state.availableListings = action.payload;
+    },
+    fetchAvailableListingsFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    fetchListingById(state, _action: PayloadAction<string>) {
+      state.isLoading = true;
+      state.error = null;
+    },
+    fetchListingByIdSucceeded(state, action: PayloadAction<Listing>) {
+      state.isLoading = false;
+      state.currentListing = action.payload;
+    },
+    fetchListingByIdFailed(state, action: PayloadAction<string>) {
+      state.isLoading = false;
+      state.error = action.payload;
+    },
+    placeBid(state, _action: PayloadAction<PlaceBidPayload>) {
+      state.isSubmittingBid = true;
+      state.bidError = null;
+      state.submittedBidId = null;
+    },
+    placeBidSucceeded(state, action: PayloadAction<string>) {
+      state.isSubmittingBid = false;
+      state.submittedBidId = action.payload;
+    },
+    placeBidFailed(state, action: PayloadAction<string>) {
+      state.isSubmittingBid = false;
+      state.bidError = action.payload;
+    },
+    clearBidFeedback(state) {
+      state.bidError = null;
+      state.submittedBidId = null;
+    },
+    clearCurrentListing(state) {
+      state.currentListing = null;
+    },
+  },
+});
+
+export const {
+  fetchAvailableListings,
+  fetchAvailableListingsSucceeded,
+  fetchAvailableListingsFailed,
+  fetchListingById,
+  fetchListingByIdSucceeded,
+  fetchListingByIdFailed,
+  placeBid,
+  placeBidSucceeded,
+  placeBidFailed,
+  clearBidFeedback,
+  clearCurrentListing,
+} = marketplaceSlice.actions;
+
+export default marketplaceSlice.reducer;
