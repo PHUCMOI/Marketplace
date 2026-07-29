@@ -5,10 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="description" content="LogisticsMarketplace - Comprehensive freight management and dispatch platform">
   <meta name="theme-color" content="#2563eb">
+  <meta name="importmap-type" content="systemjs-importmap">
   <title>LogisticsMarketplace - Freight Management Platform</title>
+  <script type="systemjs-importmap">
+    {
+      "imports": {
+        "@logistics-marketplace/shipper-mfe": "http://localhost:3003/shipper-mfe.js",
+        "@logistics-marketplace/carrier-mfe": "http://localhost:3002/carrier-mfe.js",
+        "@logistics-marketplace/dispatcher-mfe": "http://localhost:3001/dispatcher-mfe.js"
+      }
+    }
+  </script>
+  <script src="import-map-overrides.js"></script>
+  <script src="system.min.js"></script>
 </head>
 <body>
   <noscript>You need to enable JavaScript to run this application.</noscript>
   <div id="root"></div>
+  <import-map-overrides-full
+    show-when-local-storage="devtools"
+    dev-libs
+  ></import-map-overrides-full>
 </body>
 </html>

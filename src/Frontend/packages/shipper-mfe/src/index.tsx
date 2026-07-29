@@ -1,4 +1,25 @@
 
-import('./bootstrap').catch((err) => {
-  console.error('Failed to load shipper-mfe application:', err);
+import React from 'react';
+import ReactDOMClient from 'react-dom/client';
+import singleSpaReact from 'single-spa-react';
+import ShipperApp from './ShipperApp';
+
+const lifecycles = singleSpaReact({
+  React,
+  ReactDOMClient,
+  rootComponent: ShipperApp,
+  errorBoundary: (error) => (
+    <div role="alert">Shipper application failed: {error.message}</div>
+  ),
 });
+
+const setStylesEnabled = (enabled: boolean): Promise<void> => {
+  document
+    .querySelectorAll<HTMLStyleElement>('style[data-single-spa-application="shipper-mfe"]')
+    .forEach((style) => { style.media = enabled ? 'all' : 'not all'; });
+  return Promise.resolve();
+};
+
+export const bootstrap = lifecycles.bootstrap;
+export const mount = [() => setStylesEnabled(true), lifecycles.mount];
+export const unmount = [lifecycles.unmount, () => setStylesEnabled(false)];

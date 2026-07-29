@@ -1,42 +1,46 @@
 {
-    "name":  "@logistics-marketplace/shell",
-    "version":  "1.0.0",
-    "private":  true,
-    "description":  "Shell application - Module Federation Host for LogisticsMarketplace",
-    "main":  "src/index.tsx",
-    "scripts":  {
-                    "start":  "webpack serve --mode development --open",
-                    "build":  "webpack --mode production",
-                    "build:dev":  "webpack --mode development",
-                    "clean":  "rimraf dist",
-                    "type-check":  "tsc --noEmit",
-                    "lint":  "eslint src --ext .ts,.tsx"
-                },
-    "dependencies":  {
-                         "react":  "^18.2.0",
-                         "react-dom":  "^18.2.0",
-                         "react-router-dom":  "^6.20.0",
-                         "@logistics-marketplace/shared":  "^1.0.0"
-                     },
-    "devDependencies":  {
-                            "@module-federation/enhanced":  "^0.2.3",
-                            "@types/react":  "^18.2.45",
-                            "@types/react-dom":  "^18.2.18",
-                            "@types/react-router-dom":  "^5.3.3",
-                            "css-loader":  "^6.8.1",
-                            "html-webpack-plugin":  "^5.6.0",
-                            "rimraf":  "^5.0.5",
-                            "style-loader":  "^3.3.3",
-                            "ts-loader":  "^9.5.1",
-                            "typescript":  "^5.3.3",
-                            "webpack":  "^5.89.0",
-                            "webpack-cli":  "^5.1.4",
-                            "webpack-dev-server":  "^4.15.1"
-                        },
-    "engines":  {
-                    "node":  "\u003e=18.0.0",
-                    "npm":  "\u003e=9.0.0"
-                },
-    "author":  "LogisticsMarketplace Team",
-    "license":  "MIT"
+    "name": "@logistics-marketplace/shell",
+    "version": "1.0.0",
+    "private": true,
+    "description": "single-spa root shell for LogisticsMarketplace",
+    "main": "src/index.tsx",
+    "scripts": {
+        "start": "webpack serve --mode development --open",
+        "build": "webpack --mode production",
+        "build:dev": "webpack --mode development",
+        "clean": "rimraf dist",
+        "type-check": "tsc --noEmit",
+        "lint": "eslint src --ext .ts,.tsx"
+    },
+    "dependencies": {
+        "@logistics-marketplace/shared": "^1.0.0",
+        "import-map-overrides": "^6.1.0",
+        "react": "^18.2.0",
+        "react-dom": "^18.2.0",
+        "react-router-dom": "^6.20.0",
+        "single-spa": "^6.0.3",
+        "single-spa-react": "^6.0.2",
+        "systemjs": "^6.15.1"
+    },
+    "devDependencies": {
+        "@types/react": "^18.2.45",
+        "@types/react-dom": "^18.2.18",
+        "@types/react-router-dom": "^5.3.3",
+        "copy-webpack-plugin": "^13.0.1",
+        "css-loader": "^6.8.1",
+        "html-webpack-plugin": "^5.6.0",
+        "rimraf": "^5.0.5",
+        "style-loader": "^3.3.3",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.3.3",
+        "webpack": "^5.89.0",
+        "webpack-cli": "^5.1.4",
+        "webpack-dev-server": "^4.15.1"
+    },
+    "engines": {
+        "node": ">=18.0.0",
+        "npm": ">=9.0.0"
+    },
+    "author": "LogisticsMarketplace Team",
+    "license": "MIT"
 }

@@ -31,7 +31,7 @@ Main aggregate roots are `Listing`, `Bid`, `Deal`, `Dispatch`, `Vehicle`, `Drive
 - Entity Framework Core 8, PostgreSQL/Npgsql
 - JWT bearer authentication and PBKDF2 password hashing
 - React 18, TypeScript, Redux Toolkit
-- Webpack 5 Module Federation, Lerna, npm workspaces
+- single-spa 6, React 18, Webpack 5, Lerna, npm workspaces
 - xUnit
 
 ## Run locally without Docker (Windows PowerShell)
@@ -146,16 +146,32 @@ npm.cmd install
 npm.cmd start
 ```
 
-`npm.cmd start` starts the shell and all three Module Federation remotes in the same terminal:
+`npm.cmd start` starts the single-spa shell and all three independently deployable bundle servers in the same terminal:
 
 | Application | URL | Usage |
 | --- | --- | --- |
 | Shell | `http://localhost:3000` | Main entry point; use this URL |
-| Dispatcher remote | `http://localhost:3001` | Loaded by the shell |
-| Carrier remote | `http://localhost:3002` | Loaded by the shell |
-| Shipper remote | `http://localhost:3003` | Loaded by the shell |
+| Dispatcher bundle | `http://localhost:3001/dispatcher-mfe.js` | Loaded and mounted by the shell |
+| Carrier bundle | `http://localhost:3002/carrier-mfe.js` | Loaded and mounted by the shell |
+| Shipper bundle | `http://localhost:3003/shipper-mfe.js` | Loaded and mounted by the shell |
 
 Open only `http://localhost:3000` for normal use. The remote ports are not separate user-facing applications.
+
+Each MFE is a `System.register` bundle that exposes `bootstrap`, `mount`, and `unmount`. The shell resolves its module name through the import map in `packages/shell/public/index.html`:
+
+```html
+<script type="systemjs-importmap">
+  {
+    "imports": {
+      "@logistics-marketplace/shipper-mfe": "https://cdn.example.com/shipper-mfe.js",
+      "@logistics-marketplace/carrier-mfe": "https://cdn.example.com/carrier-mfe.js",
+      "@logistics-marketplace/dispatcher-mfe": "https://cdn.example.com/dispatcher-mfe.js"
+    }
+  }
+</script>
+```
+
+Run `localStorage.setItem('devtools', 'true')` and reload the shell to show the import-map-overrides panel. Navigating away from `/shipper`, `/carrier`, or `/dispatcher` invokes that bundle's `unmount` lifecycle; SystemJS keeps the downloaded module cached for later mounts.
 
 ### 7. Register and sign in
 
@@ -189,12 +205,12 @@ Stop the Core API and repeat step 3. The `/health` endpoint is currently a proce
 
 #### The main page is blank
 
-Confirm that `npm.cmd start` is still running and that ports `3000` through `3003` are listening. Then check that these remote manifests respond:
+Confirm that `npm.cmd start` is still running and that ports `3000` through `3003` are listening. Then check that these lifecycle bundles respond:
 
 ```powershell
-curl.exe -I http://localhost:3001/remoteEntry.js
-curl.exe -I http://localhost:3002/remoteEntry.js
-curl.exe -I http://localhost:3003/remoteEntry.js
+curl.exe -I http://localhost:3001/dispatcher-mfe.js
+curl.exe -I http://localhost:3002/carrier-mfe.js
+curl.exe -I http://localhost:3003/shipper-mfe.js
 ```
 
 Restart the frontend after rebuilding the shared package if a stale bundle is cached:

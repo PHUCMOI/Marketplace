@@ -1,8 +1,8 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const ModuleFederationPlugin = require('webpack/lib/container/ModuleFederationPlugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 
-const deps = require('./package.json').dependencies;
+const importMapOverridesDirectory = path.dirname(require.resolve('import-map-overrides'));
 
 module.exports = {
   entry: './src/index.tsx',
@@ -32,47 +32,25 @@ module.exports = {
     ],
   },
   plugins: [
-    new ModuleFederationPlugin({
-      name: 'shell',
-      remotes: {
-        dispatcherMfe: 'dispatcherMfe@http://localhost:3001/remoteEntry.js',
-        carrierMfe: 'carrierMfe@http://localhost:3002/remoteEntry.js',
-        shipperMfe: 'shipperMfe@http://localhost:3003/remoteEntry.js',
-      },
-      shared: {
-        react: {
-          singleton: true,
-          requiredVersion: deps.react,
-          eager: true,
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: require.resolve('systemjs/dist/system.min.js'),
+          to: 'system.min.js',
         },
-        'react-dom': {
-          singleton: true,
-          requiredVersion: deps['react-dom'],
-          eager: true,
+        {
+          from: path.join(importMapOverridesDirectory, 'import-map-overrides.js'),
+          to: 'import-map-overrides.js',
         },
-        'react-router-dom': {
-          singleton: true,
-          requiredVersion: deps['react-router-dom'],
-        },
-        '@mui/material': {
-          singleton: true,
-          requiredVersion: deps['@mui/material'],
-        },
-        '@reduxjs/toolkit': {
-          singleton: true,
-          requiredVersion: deps['@reduxjs/toolkit'],
-        },
-        'react-redux': {
-          singleton: true,
-          requiredVersion: deps['react-redux'],
-        },
-      },
+      ],
     }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
   ],
   output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].[contenthash].js',
     publicPath: 'http://localhost:3000/',
     clean: true,
   },

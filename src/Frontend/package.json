@@ -2,7 +2,7 @@
   "name": "logistics-marketplace-frontend",
   "version": "1.0.0",
   "private": true,
-  "description": "LogisticsMarketplace Frontend - Micro-frontends with Module Federation",
+  "description": "LogisticsMarketplace Frontend - Micro-frontends orchestrated with single-spa",
   "workspaces": [
     "packages/*"
   ],

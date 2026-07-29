@@ -30,10 +30,14 @@ const theme = createTheme({
 
 const CarrierContent: React.FC = () => <Provider store={store}><ThemeProvider theme={theme}><CssBaseline /><CarrierRoutes /></ThemeProvider></Provider>;
 
-const CarrierApp: React.FC = () => {
+export interface CarrierAppProps {
+  basePath?: string;
+}
+
+const CarrierApp: React.FC<CarrierAppProps> = ({ basePath = '/' }) => {
   const hasRouter = useInRouterContext();
   const content = <CarrierContent />;
-  return hasRouter ? content : <BrowserRouter>{content}</BrowserRouter>;
+  return hasRouter ? content : <BrowserRouter basename={basePath}>{content}</BrowserRouter>;
 };
 
 export default CarrierApp;

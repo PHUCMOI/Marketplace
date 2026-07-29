@@ -30,10 +30,14 @@ const theme = createTheme({
 
 const DispatcherContent: React.FC = () => <Provider store={store}><ThemeProvider theme={theme}><CssBaseline /><DispatcherRoutes /></ThemeProvider></Provider>;
 
-const DispatcherApp: React.FC = () => {
+export interface DispatcherAppProps {
+  basePath?: string;
+}
+
+const DispatcherApp: React.FC<DispatcherAppProps> = ({ basePath = '/' }) => {
   const hasRouter = useInRouterContext();
   const content = <DispatcherContent />;
-  return hasRouter ? content : <BrowserRouter>{content}</BrowserRouter>;
+  return hasRouter ? content : <BrowserRouter basename={basePath}>{content}</BrowserRouter>;
 };
 
 export default DispatcherApp;
